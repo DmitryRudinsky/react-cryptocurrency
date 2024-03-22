@@ -1,54 +1,16 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext} from 'react';
 import {ArrowDownOutlined, ArrowUpOutlined} from '@ant-design/icons';
 import {Layout, Card, Statistic, List, Typography, Spin, Tag} from 'antd';
-import {fetchAssets} from "../../api"
-import {persentDifference, capitalize} from "../../utils"
+import {capitalize} from "../../utils"
+import CryptoContex from "../../context/crypto-contex";
 
 
 const siderStyle = {
   padding: "1rem",
 };
 const AppSider = () => {
+  const { assets} = useContext(CryptoContex);
 
-  const [loading, setLoading] = useState(false);
-  const [crypto, setCrypto] = useState([]);
-  const [assets, setAssets] = useState([]);
-
-  useEffect(() => {
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        'X-API-KEY': 'wRT4xu8Q5kf7vyzOc0cXYpMYR3SDLZmuI/XVzr8aRz8='
-      }
-    };
-    async function preload() {
-      setLoading(true);
-      const response = await fetch('https://openapiv1.coinstats.app/coins', options)
-      const resultJSON = await response.json();
-      const result = resultJSON.result
-      const assets = await fetchAssets();
-      setCrypto(result);
-      setAssets(
-        assets.map((asset) => {
-          const coin = result.find((c) => c.id === asset.id);
-          return {
-            grow: asset["price"] < coin["price"],
-            growPercent: persentDifference(asset['price'], coin['price']),
-            totalAmount: asset.amount * coin['price'],
-            totalProfit: asset.amount * coin['price'] - asset.amount * asset['price'],
-            ...asset
-          }
-        })
-      );
-      setLoading(false);
-    }
-    preload();
-  }, []);
-
-  if (loading) {
-    return <Spin fullscreen/>
-  }
 
   return (
     <Layout.Sider width="25%" style={siderStyle}>
