@@ -1,15 +1,15 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import {ArrowDownOutlined, ArrowUpOutlined} from '@ant-design/icons';
-import {Layout, Card, Statistic, List, Typography, Spin, Tag} from 'antd';
+import {Layout, Card, Statistic, List, Typography, Tag} from 'antd';
 import {capitalize} from "../../utils"
-import CryptoContex from "../../context/crypto-contex";
+import  {useCrypto} from "../../context/crypto-contex";
 
 
 const siderStyle = {
   padding: "1rem",
 };
 const AppSider = () => {
-  const { assets} = useContext(CryptoContex);
+  const { assets} = useCrypto();
 
 
   return (
