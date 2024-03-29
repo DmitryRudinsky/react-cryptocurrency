@@ -15,6 +15,19 @@ export function CryptoContexProvider({ children }){
   const [crypto, setCrypto] = useState([]);
   const [assets, setAssets] = useState([]);
 
+  function mapAssets(assets, result){
+    return assets.map((asset) => {
+      const coin = result.find((c) => c.id === asset.id);
+      return {
+        grow: asset["price"] < coin["price"],
+        growPercent: isNaN(persentDifference(asset['price'], coin['price'])) ? 0 : persentDifference(asset['price'], coin['price']),
+        totalAmount: asset.amount * coin['price'],
+        totalProfit: asset.amount * coin['price'] - asset.amount * asset['price'],
+        ...asset
+      }
+    })
+  }
+
   useEffect(() => {
     const options = {
       method: 'GET',
@@ -30,27 +43,18 @@ export function CryptoContexProvider({ children }){
       const result = resultJSON.result
       const assets = await fetchAssets();
       setCrypto(result);
-      setAssets(
-        assets.map((asset) => {
-          const coin = result.find((c) => c.id === asset.id);
-          return {
-            grow: asset["price"] < coin["price"],
-            growPercent: persentDifference(asset['price'], coin['price']),
-            totalAmount: asset.amount * coin['price'],
-            totalProfit: asset.amount * coin['price'] - asset.amount * asset['price'],
-            ...asset
-          }
-        })
-      );
+      setAssets(mapAssets(assets, result));
       setLoading(false);
     }
     preload();
   }, []);
 
-  return <CryptoContex.Provider value={{loading, crypto, assets}}>{children}</CryptoContex.Provider>
-}
+  function addAsset(newAsset){
+    setAssets((prev) => mapAssets([...prev, newAsset], crypto));
+  }
 
-export  default CryptoContex;
+  return <CryptoContex.Provider value={{loading, crypto, assets, addAsset}}>{children}</CryptoContex.Provider>
+}
 
 export function useCrypto(){
   return useContext(CryptoContex);
